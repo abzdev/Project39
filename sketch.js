@@ -1,8 +1,8 @@
 var monkey, monkey_running, monkeyImage;
-var banana ,bananaImage, obstacle, obstacleImage;
+var banana ,bananaImage, obstacle, obstacleImage, road, roadImg;
 var bananaGroup, obstacleGroup;
 var score = 0;
-var ground, groundLength = 1000;
+var ground;
 var gameState = 1;
 
 function preload(){
@@ -10,31 +10,37 @@ function preload(){
   monkeyImage = loadImage("sprite_0.png");
   bananaImage = loadImage("banana.png");
   obstacleImage = loadImage("obstacle.png");
- 
+  roadImg = loadImage("road.jpg");
 }
 
 
 
 function setup() {
-  createCanvas(600,600);
-  
+  createCanvas(600,500);
+  road = createSprite(500,height-120, 10,10);
+  road.addImage(roadImg);
+  road.scale = 2;
+
   bananaGroup = new Group();
   obstacleGroup = new Group();
   
-  ground = createSprite(300,500,groundLength,10);
+  ground = createSprite(300,500,1000,10);
   
   monkey = createSprite(100,460,10,10);
   monkey.addAnimation("running", monkey_running);
   monkey.velocityX = 8;
-  
-  monkey.scale = 0.1;
+  monkey.scale = 0.1;  
 }
 
 
 function draw() {
-  background("white");
-  
+  background("lightblue");
+
   if(gameState === 1) {
+    if(road.x < monkey.x + 100) {
+      road.x += 300;
+    }
+    
     text("score: " + score, monkey.x,200);
     
     if(keyDown("space") && monkey.y >= 460) {
@@ -59,6 +65,8 @@ function draw() {
     if(monkey.isTouching(obstacleGroup)) {
       gameState = 0;
     }
+    drawSprites();
+
   }
   if(gameState === 0) {
       obstacleGroup.setVelocityXEach(0);
@@ -73,19 +81,15 @@ function draw() {
       
       text("score: " + score, monkey.x,200);
   }
-  ground.x = ground.width/2
-  
-  drawSprites();
+  ground.x = monkey.x;
 
   camera.position.x = monkey.x+200;
-  ground.width += 8;
 }
 
 function drawBanana() {
-  var rand = Math.round(random(350,450));
+  var rand = Math.round(random(370,470));
   banana = createSprite(monkey.x + 800,rand,10,10);
   banana.addImage(bananaImage);
-  //banana.velocityX = -6;
   banana.scale = 0.1;
   banana.lifetime = 150;
   banana.setCollider("rectangle",0,0,550,230);
@@ -95,7 +99,6 @@ function drawBanana() {
 function drawObstacle() {
   obstacle = createSprite(monkey.x + 800,470,10,10);
   obstacle.addImage(obstacleImage);
-  //obstacle.velocityX = -6;
   obstacle.scale = 0.2;
   obstacle.lifetime = 150;
   obstacle.setCollider("circle",0,0,200);
